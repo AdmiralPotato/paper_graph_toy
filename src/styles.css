@@ -1,0 +1,48 @@
+* {
+	margin: 0;
+	padding: 0;
+}
+html, body{
+	height: 100%;
+}
+body {
+	margin: 0;
+	background-color: #eeddbf;
+	background-image: url('background.jpg');
+	background-repeat: repeat;
+	background-position: center;
+	font-family: sans-serif;
+}
+
+svg {
+	display: block;
+	height: 100dvh;
+	width: 100dvw;
+	mix-blend-mode: multiply;
+}
+
+.blue {
+	color: #5c92e7;
+}
+.green {
+	color: #64bb47;
+}
+.black {
+	color: #333;
+}
+.red {
+	color: #f6687c;
+}
+.yellow {
+	color: #fbe875;
+}
+.stroke {
+	stroke: currentColor;
+	mix-blend-mode: multiply;
+}
+.nofill {
+	fill: none;
+}
+.fill {
+	fill: currentColor;
+}
