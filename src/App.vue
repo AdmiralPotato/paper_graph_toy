@@ -25,7 +25,11 @@ const setup = () => {
 		})
 	}
 };
-let running = true;
+const reset = () => {
+	circles.value.length = 0;
+	setup();
+};
+
 const attract = (a: Circle, b: Circle) => {
 	const diff = {
 		x: a.x - b.x,
@@ -44,10 +48,14 @@ const doComparison = (items: Circle[]) => {
 		}
 	}
 };
+
+let running = true;
 const loop = () => {
 	if(!running) { return }
 	requestAnimationFrame(loop);
 	doComparison(circles.value);
+	circles.value[0].xVel = 0;
+	circles.value[0].yVel = 0;
 	circles.value.forEach((circle) => {
 		circle.xVel *= 0.9991;
 		circle.yVel *= 0.9991;
@@ -62,42 +70,61 @@ const loop = () => {
 	});
 };
 requestAnimationFrame(loop);
+const handleMouseMove = (event: MouseEvent) => {
+	const rect = document.body.getBoundingClientRect();
+	const xMouse = event.clientX;
+	const yMouse = event.clientY;
+	const min = Math.min(rect.width, rect.height);
+	const half = min / 2;
+	const diffX = (rect.width / 2) - half;
+	const diffY = (rect.height / 2) - half;
+	const x = -1 + ((xMouse - diffX) / half);
+	const y = -1 + ((yMouse - diffY) / half);
+	circles.value[0].x = x;
+	circles.value[0].y = y;
+};
+
+setup();
+window.addEventListener('mousemove', handleMouseMove);
+
 onUnmounted(() => {
+	window.removeEventListener('mousemove', handleMouseMove);
 	running = false;
 });
-const reset = () => {
-	circles.value.length = 0;
-	setup();
-};
-setup();
 </script>
 <template>
-	<text
-		font-size="0.3"
-		text-anchor="middle"
-		alignment-baseline="middle"
-		class="red fill"
-		transform="rotate(-45)"
-	>chaos spaghettios</text>
-	<g class="circles">
-		<ellipse
-			v-for="(item, index) in circles"
-			:key="index"
-			:cx="item.x"
-			:cy="item.y"
-			:rx="item.r"
-			:ry="item.r"
-			stroke-width="0.02"
-			class="stroke nofill"
-			:class="item.class"
-		/>
-	</g>
-	<rect
-		width="2"
-		height="2"
-		x="-1"
-		y="-1"
+	<svg
+		viewBox="-1 -1 2 2"
 		@click="reset"
-		fill="#0000"
-	/>
+	>
+		<text
+			font-size="0.3"
+			text-anchor="middle"
+			alignment-baseline="middle"
+			class="red fill"
+			transform="rotate(-45)"
+		>chaos spaghettios</text>
+		<g class="circles">
+			<ellipse
+				v-for="(item, index) in circles"
+				:key="index"
+				:cx="item.x"
+				:cy="item.y"
+				:rx="item.r"
+				:ry="item.r"
+				stroke-width="0.02"
+				class="stroke nofill"
+				:class="item.class"
+			/>
+		</g>
+		<rect
+			width="2"
+			height="2"
+			x="-1"
+			y="-1"
+			fill="#0000"
+			stroke-width="0.02"
+			class="black stroke"
+		/>
+	</svg>
 </template>
