@@ -1,5 +1,9 @@
 <script setup lang="ts">
 import {ref, onUnmounted} from "vue";
+type Pos = {
+	x: number,
+	y: number,
+};
 type Circle = {
 	x: number,
 	y: number,
@@ -7,12 +11,13 @@ type Circle = {
 	yVel: number,
 	r: number,
 	class: string,
-}
-const colors = 'blue,green,black,red,yellow'.split(',');
+	history: Pos[],
+};
+const colors = 'black,blue,green,red,yellow'.split(',');
 const circles = ref<Circle[]>([]);
+const historySteps = 20;
 const setup = () => {
-	for (let i = 0; i < 30; i++) {
-		const colorIndex = Math.floor(Math.random() * colors.length);
+	for (let i = 0; i < 5; i++) {
 		circles.value.push({
 			x: Math.random() * 2 - 1,
 			y: Math.random() * 2 - 1,
@@ -21,7 +26,8 @@ const setup = () => {
 			xVel: 0,
 			yVel: 0,
 			r: Math.random() * 0.05 + 0.02,
-			class: colors[colorIndex],
+			class: colors[i % colors.length],
+			history: [],
 		})
 	}
 };
@@ -59,6 +65,13 @@ const loop = () => {
 	circles.value.forEach((circle) => {
 		circle.xVel *= 0.9991;
 		circle.yVel *= 0.9991;
+		circle.history.push({
+			x: circle.x,
+			y: circle.y,
+		});
+		if(circle.history.length > historySteps) {
+			circle.history.shift();
+		}
 		circle.x += circle.xVel;
 		circle.y += circle.yVel;
 		if(circle.x < -1 || circle.x > 1) {
@@ -116,6 +129,24 @@ onUnmounted(() => {
 				class="stroke nofill"
 				:class="item.class"
 			/>
+		</g>
+		<g class="history">
+			<template
+				v-for="(circle, circleIndex) in circles"
+				:key="circleIndex"
+			>
+				<ellipse
+					v-for="(point, pointIndex) in circle.history"
+					:key="[circleIndex, pointIndex].join(',')"
+					:cx="point.x"
+					:cy="point.y"
+					:rx="0.01 + ((circle.r - 0.01) * (pointIndex / circle.history.length))"
+					:ry="0.01 + ((circle.r - 0.01) * (pointIndex / circle.history.length))"
+					stroke-width="0.02"
+					class="stroke nofill"
+					:class="circle.class"
+				/>
+			</template>
 		</g>
 		<rect
 			width="2"
