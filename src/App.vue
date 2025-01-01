@@ -83,25 +83,40 @@ const loop = () => {
 	});
 };
 requestAnimationFrame(loop);
-const handleMouseMove = (event: MouseEvent) => {
+
+const handleMouseMove = (event: PointerEvent) => {
+	handleMove(event.clientX, event.clientY);
+};
+const handleTouchMove = (event: TouchEvent) => {
+	handleMove(
+		event.touches[0].clientX,
+		event.touches[0].clientY,
+	);
+};
+const handleMove = (xIn: number, yIn: number) => {
 	const rect = document.body.getBoundingClientRect();
-	const xMouse = event.clientX;
-	const yMouse = event.clientY;
 	const min = Math.min(rect.width, rect.height);
 	const half = min / 2;
 	const diffX = (rect.width / 2) - half;
 	const diffY = (rect.height / 2) - half;
-	const x = -1 + ((xMouse - diffX) / half);
-	const y = -1 + ((yMouse - diffY) / half);
+	const x = -1 + ((xIn - diffX) / half);
+	const y = -1 + ((yIn - diffY) / half);
 	circles.value[0].x = x;
 	circles.value[0].y = y;
 };
 
 setup();
-window.addEventListener('mousemove', handleMouseMove);
+const passive = { passive: true };
+window.addEventListener('pointerdown', handleMouseMove);
+window.addEventListener('pointermove', handleMouseMove);
+window.addEventListener('touchstart', handleTouchMove, passive);
+window.addEventListener('touchmove', handleTouchMove, passive);
 
 onUnmounted(() => {
-	window.removeEventListener('mousemove', handleMouseMove);
+	window.removeEventListener('pointerdown', handleMouseMove);
+	window.removeEventListener('pointermove', handleMouseMove);
+	window.removeEventListener('touchstart', handleTouchMove);
+	window.removeEventListener('touchmove', handleTouchMove);
 	running = false;
 });
 </script>
